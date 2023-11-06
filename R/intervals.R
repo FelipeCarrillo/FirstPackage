@@ -1,3 +1,15 @@
+#' @title Compute intervals by week
+#'
+#' @param dataset Data with 6 columns
+#' @param by Compute fish passage by week
+#' @param model Trap efficiency data
+#' @import plyr stats
+#' @return Confidence intervals by week
+#' @export
+#' @name intervals
+#'
+library(plyr)
+library(stats)
 intervals <- function(dataset, by, model){
   SEValues <- lm(Efficiency ~ PercQ, data = model) # Regression equation values and std Error
   MSValue <- anova(lm(Efficiency ~ PercQ, data = model))    # Mean-Square value
@@ -17,7 +29,7 @@ intervals <- function(dataset, by, model){
   covAB <- msquare*(- meanQ)/(var(model$PercQ)*n - 1)
 
   ddply(dataset, by, function(x) {
-    
+
     NumDays <- nrow(x)
     Week <- unique(x$wk)         #get the week number
     Month <- unique(x$month)
@@ -27,12 +39,12 @@ intervals <- function(dataset, by, model){
     # Count the days sampled only (I could have used length to count the sampled days)
     daysSamp <- nrow(sampled)
     NonSampDays <- NumDays - daysSamp
-    # Estimate and add the varPD column to the dataframe 
+    # Estimate and add the varPD column to the dataframe
     x$varPD <- with(x, (pd * (1 - td))/td + msquare * ((pd*(1 - td) + pd^2*td))/td^3)
     # Convert the NA's to "0" to calculate the weekly covariance.
-    x <- data.frame(lapply(x, function(x) replace(x,is.na(x),0))) 
+    x <- data.frame(lapply(x, function(x) replace(x,is.na(x),0)))
     #Subset the x dataset to extract xd,td,pd and transpose it to estimate daily covariance
-    
+
     # use the 'signif' function to apply scientific decimals to the values(or 'round' to limit the decimals)
     xd <- x$xd
     pd <- x$pd
@@ -47,7 +59,7 @@ intervals <- function(dataset, by, model){
                 covAB + transData[1, .col[1]] * transData[1, .col + 1] * varB,
               pd=transData[2, .col[1]] * transData[2, .col + 1],td=transData[3, .col[1]] * transData[3, .col + 1])
     })
-    
+
     # rbind for the output
     WCovariance <- do.call(rbind, CovSummary)
     # add the covariance

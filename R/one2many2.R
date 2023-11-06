@@ -8,7 +8,8 @@
 #' @export
 #' @name one2many2
 #' @examples
-#' p_load(tidyverse, Firstpackage)
+#' library(tidyverse)
+#' library(Firstpackage)
 #' a <- data.frame(name= c("Maria", "Tina"), age= c(5,3))
 #' a
 #' one2many2(a, age)
