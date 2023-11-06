@@ -3,12 +3,12 @@
 #' @param dataset Data with 6 columns
 #' @param by Compute fish passage by week
 #' @param model Trap efficiency data
-#' @import plyr stats
+#' @import stats
 #' @return Confidence intervals by week
 #' @export
 #' @name intervals
 #'
-library(plyr)
+#library(plyr)
 library(stats)
 intervals <- function(dataset, by, model){
   SEValues <- lm(Efficiency ~ PercQ, data = model) # Regression equation values and std Error
@@ -28,7 +28,7 @@ intervals <- function(dataset, by, model){
   variance <- var(model$PercQ)
   covAB <- msquare*(- meanQ)/(var(model$PercQ)*n - 1)
 
-  ddply(dataset, by, function(x) {
+  plyr::ddply(dataset, by, function(x) {
 
     NumDays <- nrow(x)
     Week <- unique(x$wk)         #get the week number
